@@ -10,7 +10,8 @@ public class Mesh_Generator : MonoBehaviour
     int[] tris;
     public int xSize, ySize, zSize;
     private int TOTAL_VERTICES;
-    private int CORNER_VERT_TOTAL = 9;
+    private int CORNER_VERT_TOTAL = 8;
+    int vertCount = 0;
 
 
     // (where "x", "y", and "z" are quantities of vertices / x,y,z dimensions of object)
@@ -29,36 +30,63 @@ public class Mesh_Generator : MonoBehaviour
     void Start()
     {
         CalculateTotalVertices();
-        MakeMeshData();
-        GenerateMesh();
+        // GenerateMesh();
     }
 
     void CalculateTotalVertices(){
         int e = 4 * (xSize + ySize + zSize - 3);
         int f = 2 * ((xSize-1)*(ySize-1) + (xSize-1)*(zSize-1) + (ySize-1)*(zSize-1));
         TOTAL_VERTICES = CORNER_VERT_TOTAL + f + e;
+        vertices = new Vector3[TOTAL_VERTICES];
+        StartCoroutine(MakeMeshData());
     }
 
-    void MakeMeshData(){
-        vertices = new Vector3[]{
-            new Vector3(0,0,0),
-            new Vector3(0,2,0),
-            new Vector3(4,0,0),
-            new Vector3(4,0,0),
-            new Vector3(0,2,0),
-            new Vector3(1,4,5)
-        };
-        tris = new int[] {0,1,2,3,4,5};
-        for (int i = 0; i < vertices.Length; i++)
+    private IEnumerator MakeMeshData(){
+        WaitForSeconds wait = new WaitForSeconds(0.1f);
+        for (int y = 0; y < ySize; y++)
         {
-            tris[i] = i;
-            
+            for (int x = 0; x <= xSize; x++) 
+            {
+                vertices[vertCount] = new Vector3(x, y, 0);
+                vertCount++;
+                Debug.Log(vertCount);
+                yield return wait;
+            }
+            for (int z = 1; z <= zSize; z++)
+            {
+                vertices[vertCount] = new Vector3(0, y, z);
+                vertCount++;
+                Debug.Log(vertCount);
+                yield return wait;
+            }
+            for (int x = xSize - 1; x >= 0; x--)
+            {
+                vertices[vertCount] = new Vector3(x, y, zSize);
+                vertCount++;
+                Debug.Log(vertCount);
+                yield return wait;
+            }
+            for (int z = zSize; z > 0; z--)
+            {
+                vertices[vertCount] = new Vector3(xSize, y, z);
+                vertCount++;
+                Debug.Log(vertCount);
+                yield return wait;
+            }
+            vertCount++;
         }
     }
 
+    void OnDrawGizmos () {
+		Gizmos.color = Color.black;
+		for (int i = 0; i < vertCount; i++) {
+			Gizmos.DrawSphere(vertices[i], 0.1f);
+		}
+    }
+
     void GenerateMesh(){
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = tris;
+        // mesh.Clear();
+        // mesh.vertices = vertices;
+        // mesh.triangles = tris;
     }
 }
