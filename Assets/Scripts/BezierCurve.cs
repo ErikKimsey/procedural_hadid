@@ -6,7 +6,7 @@ public class BezierCurve : MonoBehaviour
 {
     public int SEG_COUNT;
     public int CTRL_PT_COUNT;
-    private float t;
+    private float t = 1;
     private Vector3[] ctrlPointsPositions;
     private Vector3[] theCurve;
 
@@ -16,6 +16,7 @@ public class BezierCurve : MonoBehaviour
     {
         theCurve = new Vector3[SEG_COUNT];
         CreatePoints();
+        RenderCurve();
     }
 
     private void CreatePoints(){
@@ -33,19 +34,29 @@ public class BezierCurve : MonoBehaviour
         {
             for (int j = 0; j < SEG_COUNT; j++)
             {
-                t = SEG_COUNT - j;
-                theCurve[j] = Bezier(t, ctrlPointsPositions[i])
+                theCurve[j] = Bezier(j, ctrlPointsPositions[i]);
             }
         }
     }
 
-    private Vector3 Bezier(int tCoeff, int nSeg, Vector3 Pn){
-
+    private Vector3 Bezier(float segIndex, Vector3 Pn){
+        float tCoeff = BinomialCoeff(segIndex);
+        Debug.Log("tCoeff");
+        Debug.Log(tCoeff);
+        Vector3 temp = new Vector3(0,0,0);
+        temp = tCoeff * Pn;
+        Debug.Log("temp");
+        Debug.Log(temp);
+        return temp;
     }
 
-    private int Bernstein(int tCoeff, int nSeg){
-        int 
+    private float BinomialCoeff(float segIndex){
+        return(SEG_COUNT/(segIndex * (SEG_COUNT - segIndex)));
     }
+
+    // private float Bernstein(float tCoeff, float segIndex){
+    //     return tCoeff * ;
+    // }
 
     // Update is called once per frame
     void Update()
