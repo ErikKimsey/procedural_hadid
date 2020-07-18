@@ -4,63 +4,83 @@ using UnityEngine;
 
 public class BezierCurve : MonoBehaviour
 {
-    public int SEG_COUNT;
-    public int CTRL_PT_COUNT;
-    private float t = 1;
-    private Vector3[] ctrlPointsPositions;
-    private Vector3[] theCurve;
 
     // public 
     
-    void Start()
-    {
-        theCurve = new Vector3[SEG_COUNT];
-        CreatePoints();
-        RenderCurve();
-    }
+        public List<Vector3> pathPoints;
+		private int segments;
+		public int pointCount;
+        public List<Vector3> controlPoints;
+        public GameObject gloCube;
+        private GameObject[] gameObjects;
 
-    private void CreatePoints(){
-        ctrlPointsPositions = new Vector3[]{
-            new Vector3(0,0,0),
-            new Vector3(1,2,2),
-            new Vector3(1,4,4),
-            new Vector3(4,2,0)
-        };
-    }
-
-    private void RenderCurve(){
-        // B(t) = (1-t)3P0 + 3(1-t)2tP1 + 3(1-t)t2P2 + t3P3 ; 0 < t < 1
-        for (int i = 0; i < CTRL_PT_COUNT; i++)
+        void Start()
         {
-            for (int j = 0; j < SEG_COUNT; j++)
-            {
-                theCurve[j] = Bezier(j, ctrlPointsPositions[i]);
-            }
+            Debug.Log(pointCount);
+			pathPoints = new List<Vector3>();
+			pointCount = 100;
+            CreateCtrlPoints();
+            CreateCurve(controlPoints);
+            gameObjects = new GameObject[pointCount];
         }
-    }
+		
+		public void CreateCtrlPoints()
+		{
+            controlPoints.Add(new Vector3(-2,0,-5));
+            controlPoints.Add(new Vector3(0,5,30));
+            controlPoints.Add(new Vector3(3,0,-30));
+            controlPoints.Add(new Vector3(6,4,0));
+		}
 
-    private Vector3 Bezier(float segIndex, Vector3 Pn){
-        float tCoeff = BinomialCoeff(segIndex);
-        Debug.Log("tCoeff");
-        Debug.Log(tCoeff);
-        Vector3 temp = new Vector3(0,0,0);
-        temp = tCoeff * Pn;
-        Debug.Log("temp");
-        Debug.Log(temp);
-        return temp;
-    }
+		public void DeletePath()
+		{
+			pathPoints.Clear();
+		}
+		
+		Vector3 BezierPathCalculation(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
+		{	
+			float tt = t * t;
+			float ttt = t * tt;
+			float u = 1.0f - t;
+			float uu = u * u;
+			float uuu = u * uu;
+			
+			Vector3 B = new Vector3();
+			B = uuu * p0;
+			B += 3.0f * uu * t * p1;
+			B += 3.0f * u * tt * p2;
+			B += ttt * p3;
+			return B;
+		}
+		
+		public void CreateCurve(List<Vector3> controlPoints)
+		{
+			segments = controlPoints.Count / 3;
 
-    private float BinomialCoeff(float segIndex){
-        return(SEG_COUNT/(segIndex * (SEG_COUNT - segIndex)));
-    }
+			for (int s = 0; s < controlPoints.Count -3; s+=3) 
+			{
+				Vector3 p0 = controlPoints[s];
+				Vector3 p1 = controlPoints[s+1];
+				Vector3 p2 = controlPoints[s+2]; 
+				Vector3 p3 = controlPoints[s+3];
 
-    // private float Bernstein(float tCoeff, float segIndex){
-    //     return tCoeff * ;
-    // }
+				if(s == 0)
+				{
+					pathPoints.Add(BezierPathCalculation(p0, p1, p2, p3, 0.0f));
+				}    
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+				for (int p = 0; p < (pointCount/segments); p++) 
+				{
+					float t = (1.0f / (pointCount/segments)) * p;
+					Vector3 point = new Vector3 ();
+					point = BezierPathCalculation (p0, p1, p2, p3, t);
+					pathPoints.Add (point);
+                    InstantiateObjs(point);
+				}
+			}
+		}
+
+        public void InstantiateObjs(Vector3 point){
+            GameObject clone = Instantiate(gloCube, point, Quaternion.identity);
+        }
 }
