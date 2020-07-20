@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class BezierCurve : MonoBehaviour
 {
 
@@ -40,7 +41,6 @@ public class BezierCurve : MonoBehaviour
 		
 		Vector3 BezierPathCalculation(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
 		{	
-			Debug.Log(t);
 			float tt = t * t;
 			float ttt = t * tt;
 			float u = 1.0f - t;
@@ -77,12 +77,18 @@ public class BezierCurve : MonoBehaviour
 					Vector3 point = new Vector3 ();
 					point = BezierPathCalculation (p0, p1, p2, p3, t);
 					pathPoints.Add (point);
-                    InstantiateObjs(point);
+                    InstantiateObjs(point, p);
 				}
 			}
 		}
 
-        public void InstantiateObjs(Vector3 point){
+        public void InstantiateObjs(Vector3 point, float t){
+			float rotateX = (t * 10f);
+			float rotateY = t * point.x + 133f;
+			float rotateZ = t * point.x + 133f;
+			Debug.Log(rotateZ);
+			Vector3 r = new Vector3(rotateX, rotateY, rotateZ);
             GameObject clone = Instantiate(gloCube, point, Quaternion.identity, this.transform);
+			clone.transform.Rotate(r, Space.World);
         }
 }
