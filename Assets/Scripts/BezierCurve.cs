@@ -13,6 +13,7 @@ public class BezierCurve : MonoBehaviour
         public List<Vector3> controlPoints;
         public GameObject gloCube;
         private GameObject[] gameObjects;
+		public GameObject hadidParent;
 
         void Start()
         {
@@ -39,6 +40,7 @@ public class BezierCurve : MonoBehaviour
 		
 		Vector3 BezierPathCalculation(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
 		{	
+			Debug.Log(t);
 			float tt = t * t;
 			float ttt = t * tt;
 			float u = 1.0f - t;
@@ -81,6 +83,6 @@ public class BezierCurve : MonoBehaviour
 		}
 
         public void InstantiateObjs(Vector3 point){
-            GameObject clone = Instantiate(gloCube, point, Quaternion.identity);
+            GameObject clone = Instantiate(gloCube, point, Quaternion.identity, this.transform);
         }
 }
