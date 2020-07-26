@@ -9,8 +9,6 @@ public class BezierCurve : MonoBehaviour
     private float t = 1;
     private Vector3[] ctrlPointsPositions;
     private Vector3[] theCurve;
-
-    // public 
     
     void Start()
     {
